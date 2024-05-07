@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Spectre Desktop</title>
+	<meta charset="utf-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+	<link rel="stylesheet" type="text/css" href="/resources/extern/fonts/fontawesome/css/all.min.css" />
+	<link rel="stylesheet" type="text/css" href="/node_modules/@aspectron/flow-ux/flow-ux.css" />
+	<link rel="stylesheet" type="text/css" href="/node_modules/@spectre/ux/spectre-ux.css">
+	<link rel="stylesheet" type="text/css" href="/resources/styles/spectre-desktop.css">
+	<script type="importmap">
+		{
+			"imports" : {
+				"@lit/reactive-element" : "/node_modules/@lit/reactive-element/reactive-element.js",
+				"lit-element/lit-element.js" : "/node_modules/lit-element/lit-element.js",
+				"lit-html/directive.js":"/node_modules/lit-html/directive.js",
+				"lit-html/async-directive.js":"/node_modules/lit-html/async-directive.js",
+				"lit-html" : "/node_modules/lit-html/lit-html.js",
+				"lit-html/lit-html.js" : "/node_modules/lit-html/lit-html.js",
+				"lit-html/lib/shady-render.js" : "/node_modules/lit-html/lib/shady-render.js",
+				"lit-element" : "/node_modules/lit-element/lit-element.js",
+				"lit-html/directives/if-defined.js":"/node_modules/lit-html/directives/if-defined.js",
+				"lit-html/directives/repeat.js": "/node_modules/lit-html/directives/repeat.js",
+				"/flow/flow-ux/src/flow-format.js": "/node_modules/@aspectron/flow-ux/src/flow-format.js",
+				"/flow/flow-ux/src/base-element.js": "/node_modules/@aspectron/flow-ux/src/base-element.js",
+				"/flow/flow-ux/src/flow-swipeable.js": "/node_modules/@aspectron/flow-ux/src/flow-swipeable.js",
+				"/flow/flow-ux/src/flow-i18n.js": "/node_modules/@aspectron/flow-ux/src/flow-i18n.js",
+				"@spectre/wallet": "./spectre-wallet-module.js",
+				"@spectre/wallet-worker": "./spectre-wallet-worker-module.js",
+				"@spectre/core-lib": "./spectre-core-lib-module.js"
+			}
+		}
+	</script>
+	<script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+	<script type="text/javascript" src="/resources/extern/ace/src/ace.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/resources/extern/ace/src/mode-html.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/resources/extern/ace/src/mode-javascript.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		var flowConfig = {
+			theme:{
+				iconPath:'/resources/extern/fonts/fontawesome/sprites/',
+				iconFile:'light',
+				icons:{
+					language:'icons:language'
+				}
+			}
+		}
+		var SpectreConfig = {
+			workerCorePath: "/modules/controller/wallet-worker-core.js",
+			baseUrl: "/node_modules/@spectre/ux/",
+			debug:true,
+			dontInitiatedComponent:true
+		}
+	</script>
+
+	<script type="module" src="/node_modules/@aspectron/flow-ux/flow-ux.js"></script>
+	<script type="module" src="./app-startup-dialog.js"></script>
+
+	<!-- include non-module-type d3 -->
+	<script src="/resources/extern/d3/d3.js"></script>
+	<!-- include non-module-type jquery -->
+	<script src="/resources/extern/scripts/jquery-3.1.1.normal.js"></script>
+	<!-- install xterm, xterm-addon-fit, xterm-addon-web-links node-modules -->
+	<script type="module" src="/node_modules/@aspectron/flow-ux/src/flow-terminal.js"></script>
+	<script type="module" src="./spectre-wallet.js"></script>
+	<script type="text/javascript" src="/resources/rpc.js"></script>
+	<script type="module" src="/modules/controller/controller.js"></script>
+</head>
+<body class="ui-loading">
+	<spectre-desktop-app></spectre-desktop-app>
+</body>
+</html>

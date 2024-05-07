@@ -1,0 +1,168 @@
+"use strict";
+const SPECTRE_DEFAULT_BRANCH = 'main';
+
+const E = new Emanator(__dirname, {
+    type : argv.includes('build') || flags.innosetup ? 'NODE+NWJS' : 'UTIL',
+    guid : 'b28301db-4ca7-44ac-b347-b58c069056f5',
+    group : 'Spectre',
+    ident : 'spectre-desktop',
+    suffix : flags.full ? '-dev' : '',
+    title : 'Spectre Desktop',
+    banner : 'Spectre Desktop',
+    git : 'https://github.com/spectre-project/spectre-desktop',
+    author : "Spectre Network",
+    url : "https://spectre-network.org",
+    // archive : true,
+    folder : true,
+    standalone : true,
+    production: true,
+    // DMG: true,
+    nwjs : { version : '0.78.1' },
+    resources : 'resources/setup',
+
+    manifest : (manifest) => {
+        if (E.flags['with-perfmon'] && !E.flags['no-perfmon']) {
+            if (E.PLATFORM != 'macos') {
+                Object.assign(manifest.dependencies,{
+                    "@spectre/process-list": "github:spectre-project/spectre-process-list",
+                })
+            }
+        }
+
+        return manifest;
+    },
+})
+
+E.flags['with-perfmon'] = true;
+
+E.aux_dmg_files = async (root) => {
+    if (fs.existsSync(path.join(E.BUILD,'apps')))
+        await E.copy(path.join(E.BUILD,'apps'),path.join(root,'apps'));
+
+    // E.copy(process.argv[0], root);
+}
+
+const go = await E.modules.go('go1.21.6');
+const git = await E.modules.git();
+const gcc = await E.modules.gcc();
+const npm = await E.modules.npm({ production : true });
+const spectred = E.task('spectred', ['origin'], async () => {
+
+    if (E.PLATFORM == 'windows') {
+        process.env.PATH = ['C:\\TDM-GCC-64\\bin', ...process.env.PATH.split(';')].join(';');
+    }
+
+    let dest = path.join(go.SRC,'github.com/spectre-project/');
+    if ((E.flags.reset || E.flags.clean) && fs.existsSync(dest))
+        await E.emptyDir(dest);
+
+    const branch = E.flags['branch'] || SPECTRE_DEFAULT_BRANCH || 'main';
+
+    console.log('branch:',branch);
+
+    const repos = [`spectred:${branch}`];
+
+    console.log("REPOS:".brightMagenta,repos);
+
+    for(const repo of repos) {
+        let [name, git_branch] = repo.split(':');
+        console.log(`git clone https://github.com/spectre-project/${name} branch: ${git_branch || 'main'}`.brightYellow);
+        await git.clone(`https://github.com/spectre-project/${name}`,dest, {branch : git_branch || 'main'});
+    }
+
+    let targets = [
+        'spectred',
+        ...fs.readdirSync(path.join(dest,'spectred/cmd')).filter(f => f !== 'spectreminer').map(f => `spectred/cmd/${f}`),
+    ];
+
+    let rename = {}
+    console.log('Starting target processing...')
+    let folders = []
+
+    for(let target of targets) {
+        let folder = path.join(dest,target);
+        console.log('builing',folder);
+        await go.build(folder);
+        console.log('done',folder);
+        folders.push(folder);
+    }
+
+    folders.forEach((folder) => {
+        let file = path.basename(folder);
+        let name = `${E.title} ${file}`;
+        let dest = rename[file] || file;
+        file += E.PLATFORM_BINARY_EXTENSION;
+        dest += E.PLATFORM_BINARY_EXTENSION;
+
+        if (!fs.existsSync(path.join(folder,file))) {
+            console.log(`Unable to locate source file: ${path.join(folder,file)}`);
+            console.log(`...giving up`);
+            process.exit(1);
+        }
+        console.log("E.copy:", path.join(folder,file)," -> ",path.join(E.BIN,dest))
+        E.copy(path.join(folder,file),path.join(E.BIN,dest));
+        E.registerFirewallRule({ name, file : dest, binary : true });
+    })
+});
+
+E.task('remote', ['origin'], async () => {
+
+    let files = (E.manifest.files||[]).map(f=>{
+        return E.copy(path.join(E.REPO,f), path.join(E.BUILD, f));
+    })
+    E.log(`copying ${files.length} items...`);
+    await Promise.all(files);
+
+    fs.writeFileSync(path.join(E.BUILD,'i18n.lock'),'');
+    console.log(`i18n.lock`);
+})
+
+E.task('aptitude', null, async () => {
+    if (E.PLATFORM != 'linux')
+        return;
+})
+
+E.flags.docker && E.task('docker', null, async () => {
+
+    E.manifest_read();
+
+    const relay = ['no-cache'];
+    const args = ['-s','docker','build'].concat(relay.map(k=>E.flags[k]?`--${k}`:null)).filter(v=>v);
+    args.push('-t',`spectre-desktop:latest`,'.');
+    const ts0 = Date.now();
+    await E.utils.spawn('sudo', args, { cwd : __dirname, stdio: 'inherit' });
+    await E.utils.spawn('sudo',['docker','tag','spectre-desktop:latest',`spectre-desktop:${E.manifest.version}`], { cwd : __dirname, stdio: 'inherit' });
+    console.log('Docker build complete at',new Date());
+    const ts1 = Date.now();
+    console.log('Docker build took'.brightBlue,`${((ts1-ts0)/1000/60).toFixed(1)}`.brightWhite,'minutes'.brightBlue)
+});
+
+if (E.flags.i18n){
+    E.task('i18n', null, async () => {
+        E.utils.sortAndSaveI18nFiles();
+        E.utils.mergeI18nEntries2Data();
+    })
+}
+
+if (E.flags['local-binaries'] || E.flags['spectre']) {
+    E.BIN = path.join(E.appFolder,'bin', E.PLATFORM_ARCH);
+    mkdirp.sync(E.BIN);
+}
+
+if (E.flags.link) {
+    let list = ['flow-ux','flow-app','flow-utils','flow-rpc','flow-async'];
+    while(list.length) {
+        let ident = list.shift();
+        await npm.link(`@aspectron/${ident}`, { cwd : __dirname, stdio : 'inherit' });
+    }
+} else if (E.flags.docker) {
+    E.runTask('docker');
+} else if (E.flags.i18n) {
+    E.runTask('i18n');
+} else if (E.flags['spectre']) {
+    await spectred();
+} else if (E.flags['local-binaries']) {
+    E.runTask('spectred');
+    E.runTask('aptitude');
+} else
+    E.run();

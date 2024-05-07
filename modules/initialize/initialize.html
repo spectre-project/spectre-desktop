@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Spectre Desktop: Configuration</title>
+	<meta charset="utf-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+	<link rel="stylesheet" type="text/css" href="/resources/extern/fonts/fontawesome/css/all.min.css" />
+	<link rel="stylesheet" type="text/css" href="/node_modules/@aspectron/flow-ux/flow-ux.css" />
+	<link rel="stylesheet" type="text/css" href="/resources/styles/spectre-desktop.css">
+	<script type="importmap">
+		{
+			"imports" : {
+				"@lit/reactive-element" : "/node_modules/@lit/reactive-element/reactive-element.js",
+				"lit-element/lit-element.js" : "/node_modules/lit-element/lit-element.js",
+				"lit-html/directive.js":"/node_modules/lit-html/directive.js",
+				"lit-html/async-directive.js":"/node_modules/lit-html/async-directive.js",
+				"lit-html" : "/node_modules/lit-html/lit-html.js",
+				"lit-html/lit-html.js" : "/node_modules/lit-html/lit-html.js",
+				"lit-html/lib/shady-render.js" : "/node_modules/lit-html/lib/shady-render.js",
+				"lit-element" : "/node_modules/lit-element/lit-element.js",
+				"lit-html/directives/if-defined.js":"/node_modules/lit-html/directives/if-defined.js",
+				"lit-html/directives/repeat.js": "/node_modules/lit-html/directives/repeat.js"
+			}
+		}
+	</script>
+	<script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+	<script type="text/javascript" src="/resources/extern/ace/src/ace.js" charset="utf-8"></script>	
+	<script type="text/javascript" src="/resources/extern/ace/src/mode-html.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/resources/extern/ace/src/mode-javascript.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		var flowConfig = {
+			theme:{
+				iconPath:'/resources/extern/fonts/fontawesome/sprites/',
+				iconFile:'light',
+				icons:{
+					language:'icons:language'
+				}
+			}
+		}
+	</script>
+
+	<script type="module" src="/node_modules/@aspectron/flow-ux/flow-ux.js"></script>
+
+	<!-- include non-module-type jquery -->
+	<script src="/resources/extern/scripts/jquery-3.1.1.normal.js"></script>
+	<!-- install xterm, xterm-addon-fit, xterm-addon-web-links node-modules -->
+	<script type="module" src="/node_modules/@aspectron/flow-ux/src/flow-terminal.js"></script>
+	<style type="text/css">
+		body{padding:10px;}
+		.tools{padding:10px 0px; text-align:right}
+		td { padding: 2px; }
+		flow-btn{padding:7px 2px;}
+	</style>
+</head>
+<body class="welcome">
+	<h2>Configuration</h2>
+	<br/>
+	<flow-form-control icon="fal:folder">
+		<flow-i18n caption>Data Folder</flow-i18n>
+		<flow-folder-input slot="input" id="data-folder-input"
+			value="~/.spectre-desktop/data"></flow-folder-input>
+		<div slot="input" class="slot-block">
+			<flow-btn class="reset-data-dir">RESET</flow-btn>
+		</div>
+		
+		<h4 slot="info" class="title"><flow-i18n>Data Folder</flow-i18n></h4>
+			<p slot="info" is="i18n-p">
+				Data Folder location is used for storage by all Spectre Desktop
+				modules. In default configuration this includes Spectred blockchain
+				data. This location also contains process log files.
+			</p>
+	</flow-form-control>
+
+	<flow-form-control id="settings-templates" icon="fal:file-alt">
+		<flow-i18n caption>Spectre Configuration</flow-i18n>
+		<div slot="input" style="margin-top:16px;">
+			<flow-selector style="margin-right:32px;"id="template-list" label="Select Configuration Template" 
+				selected="spectred-node-only"
+				mergeattributes="value" 
+				mergeinnerhtml class="template-list"></flow-selector>
+			<flow-selector id="network-list" label="Network" selected="mainnet" 
+				mergeattributes="value" mergeinnerhtml class="network-list">
+				<div class="menu-item" value="mainnet">MAINNET</div>
+				<div class="menu-item" value="testnet">TESTNET</div>
+				<div class="menu-item" value="devnet">DEVNET</div>
+				<div class="menu-item" value="simnet">SIMNET</div>
+			</flow-selector>
+		</div>
+		<div slot="input" style="margin-top: 0;">
+			<flow-checkbox id="settings-disable-upnp" class="block">
+				<flow-i18n>Disable UPNP</flow-i18n>
+			</flow-checkbox>
+			<p>UPNP helps your node to participate in securing the Spectre network.</p>
+		</div>
+		<h4 slot="info" class="title"><flow-i18n>Spectre Stack Configuration</flow-i18n></h4>
+		<p slot="info" is="i18n-p">
+			Select Spectre stack configuration from templates.
+		</p>
+	</flow-form-control>
+
+	<flow-form-control icon="fal:plug">
+		<flow-i18n caption>WARNING - BATTERY POWER</flow-i18n>
+		<p class='battery-warning'>
+			If you are on a laptop, please plug in before proceeding.
+		</p>
+		<div slot="input" class="slot-block">
+			<flow-btn class="save-config" primary>PROCEED</flow-btn>
+		</div>
+
+	</flow-form-control>
+	<script type="module" src="/modules/initialize/initialize.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+[application]
+name = "spectre-desktop"
+title = "Spectre Desktop"
+version = "package.json::version"
+organization = "Spectre Network"
+
+[description]
+short = "Desktop Node and Wallet for Spectre"
+long = """
+Spectre Desktop is a desktop wallet and a p2p network node instance. This
+application allows you to participate in the Spectre network by running a
+local node instance and offers access to a local wallet, compatible with
+the web wallet available at https://wallet.spectre-network.org
+"""
+
+[package]
+archive = { include = true }
+signatures = ["SHA256"]
+build = [
+    { NPM = { clean = true } }
+]
+resources = "resources/setup"
+output = "setup/$PLATFORM-$ARCH"
+include = [
+    { glob = [
+            "bin/*",
+            "*.js",
+            "resources/**.css",
+            "resources/images/*.*",
+            "resources/**.ttf",
+            "resources/**.woff",
+            "resources/**.svg",
+            "i18n.*",
+            "modules/*",
+            "lib/*",
+            "node_modules/*",
+            "package.json"
+        ]},
+]
+
+[[action]]
+items = [{ copy = { glob = [
+        ".templates",
+        ".defaults",
+        "CHANGELOG.md"
+    ], to = "$TARGET", hidden = true}}]
+
+[[dependency]]
+name = "spectred"
+git = { url = "https://github.com/spectre-project/spectred", branch = "main" }
+run = [
+    { cmd = "go build" },
+    { cmd = "go build", cwd = "cmd/genkeypair" },
+    { cmd = "go build", cwd = "cmd/spectrectl" },
+    { cmd = "go build", cwd = "cmd/spectrewallet" },
+]
+copy = [
+    { regex = [
+        "spectred(.exe)?$",
+        "genkeypair(.exe)?$",
+        "spectrectl(.exe)?$",
+        "spectrewallet(.exe)?$",
+    ], to = "bin/$PLATFORM-$ARCH", flatten = true },
+]
+
+[nwjs]
+version = "0.78.1"
+ffmpeg = false
+
+[macos-disk-image]
+window_caption_height = 60
+window_position = [400,100]
+window_size = [485,330]
+icon_size = 72
+application_icon_position = [100,158]
+system_applications_folder_position = [385,158]
+
+[windows]
+uuid = "b28301db-4ca7-44ac-b347-b58c069056f5"
+group = "Spectre"
+run_after_setup = true
+
+[images]
+application="logo.png"
+macos-application="Icon1024.png"
+macos-disk-image="spectre-desktop-dmg.png"
+innosetup-icon="logo.png"
+innosetup-wizard-small="spectre-desktop-55x58.bmp"
+innosetup-wizard-large="spectre-desktop-164x314.bmp"
+
+[languages]
+languages = ["dutch", "english", "finnish", "french", "german", "italian", "polish", "portuguese", "russian", "spanish", "turkish", "ukranian"]
+
+[firewall]
+application = { direction = "in+out" }
+rules = [
+    { name = "Spectre Node", program = "bin/windows-x64/spectred.exe", direction="in+out" }
+]

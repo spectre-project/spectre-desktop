@@ -1,0 +1,77 @@
+{
+  "name": "spectre-desktop",
+  "description": "Spectre Desktop",
+  "version": "0.3.14",
+  "private": true,
+  "main": "spectre-desktop.js",
+  "files": [
+    "spectre-desktop.js",
+    "pty.js",
+    "rpc.js",
+    "node-app.js",
+    "nw-app.js",
+    "app.js",
+    "README.md",
+    "CHANGELOG.md",
+    "lib",
+    "modules",
+    "resources/extern",
+    "resources/images",
+    "resources/styles",
+    "resources/setup",
+    "resources/tpl",
+    "resources/rpc.js",
+    "i18n.data",
+    ".defaults",
+    ".templates"
+  ],
+  "dependencies": {
+    "@aspectron/flow-app": "*",
+    "@aspectron/flow-async": "*",
+    "@aspectron/flow-logger": "*",
+    "@aspectron/flow-rpc": "*",
+    "@aspectron/flow-utils": ">=0.1.1",
+    "@aspectron/flow-ux": "1.1.1",
+    "@grpc/grpc-js": "1.6.10",
+    "@grpc/proto-loader": "0.7.2",
+    "@spectre/grpc-node": "github:spectre-project/spectre-grpc-node",
+    "@spectre/ux": "github:spectre-project/spectre-ux",
+    "@spectre/wallet-worker": "github:spectre-project/spectre-wallet-worker",
+    "@runonflux/nat-upnp": "1.0.2",
+    "@webcomponents/webcomponentsjs": "2.6.0",
+    "bs58": "4.0.1",
+    "colors": "1.4.0",
+    "commander": "7.2.0",
+    "crypto-js": "4.1.1",
+    "decimal.js": "10.4.0",
+    "du": "1.0.0",
+    "fs-extra": "10.1.0",
+    "is-docker": "2.2.1",
+    "mkdirp": "1.0.4",
+    "nats": "2.0.4",
+    "node-fetch": "2.6.7",
+    "node-pty": "0.10.1",
+    "node-statsd": "0.1.1",
+    "protobufjs": "7.2.4",
+    "semver": "7.5.2",
+    "underscore": "1.13.0",
+    "ws": "7.5.9"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": "*"
+  },
+  "scripts": {
+    "start": "nw ."
+  },
+  "window": {
+    "frame": true,
+    "transparent": false,
+    "show": true
+  },
+  "node-remote": [
+    "http://localhost"
+  ],
+  "chromium-args-v1": "--disable-gpu-compositing --force-cpu-draw --enable-logging --disable-pinch --enable-experimental-web-platform-features",
+  "chromium-args": "--disable-gpu --force-cpu-draw --enable-node-worker --enable-logging --disable-pinch --enable-experimental-web-platform-features --mixed-content"
+}
